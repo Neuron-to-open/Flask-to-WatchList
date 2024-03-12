@@ -1,0 +1,63 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <title>{{ name }}'s Watchlist</title>-->
+<!--    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" type="text/css">-->
+<!--</head>-->
+
+<!--<body>-->
+<!--    &lt;!&ndash; 可以是利用jinja2的语法   &ndash;&gt;-->
+<!--    <h2><img alt="Avatar"  class="avatar" src="{{url_for('static', filename='/images/avatar.png')}}">-->
+<!--        {{ name }}'s Watchlist-->
+<!--    </h2>-->
+
+<!--    {# 使用 length 过滤器获取 movies 变量的长度 #}-->
+<!--    <p>{{ movies|length }} Titles</p>-->
+<!--    <ul class="movie-list">-->
+<!--        {% for movie in movies %}  {# 迭代 movies 变量 #}-->
+<!--        <li>{{ movie.title }} - {{ movie.year }}</li>  {# 等同于 movie['title'] #}-->
+<!--        {% endfor %}  {# 使用 endfor 标签结束 for 语句 #}-->
+<!--    </ul>-->
+
+<!--    <img alt="Walking Totoro" class="totoro" src="{{url_for('static', filename='/images/totoro.gif')}}">-->
+<!--    <footer>-->
+<!--        <small>&copy; 2018 <a href="http://helloflask.com/book/3">HelloFlask</a></small>-->
+<!--    </footer>-->
+
+
+<!--</body>-->
+<!--</html>-->
+<!-- 继承模板 -->
+{% extends 'base.html' %}
+{% block content %}
+<p>{{ movies|length }} Titles</p>
+<!--请求部分-->
+{%  if current_user.is_authenticated %}
+<form method="post">
+    Name<input type="text" name="title" autocomplete="off" required>
+    Year<input type="text" name="year" autocomplete="off" required>
+    <input class="btn" type="submit" value="Add">
+</form>
+{%  endif %}
+
+<!--展示列表部分-->
+<ul class="movie-list">
+    {% for movie in movies %}
+    <li>{{ movie.title }} - {{ movie.year }}
+        <span class="float-right">
+            {% if current_user.is_authenticated %}
+                <a class="btn" href="{{url_for('edit', movie_id = movie.id)}}">Edit</a>
+                <form class="inline-form" method="post" action="{{url_for('delete', movie_id=movie.id)}}">
+                    <input class="btn" type="submit" name="delete" value="Delete" onclick="return confirm ('Are you sure?')">
+                </form>
+            {%  endif  %}
+
+            <a class="btn" href="{{url_for('edit', movie_id = movie.id)}}">Edit</a>
+            <a class="imdb" href="https://www.imdb.com/find?q={{ movie.title }}" target="_blank" title="Find this movie on IMDb">IMDb</a>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+<img alt="Walking Totoro" class="totoro" src="{{ url_for('static', filename='images/totoro.gif') }}" title="to~to~ro~">
+{% endblock %}
